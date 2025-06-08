@@ -1,0 +1,46 @@
+#!/bin/sh
+
+set -e  # fail on errors
+set -x  # log what's going on
+
+fail () {
+    echo "FAILED: $*"
+    exit 1
+}
+
+SRC_RPM_URL=https://download.fedoraproject.org/pub/fedora/linux/updates/39/Everything/source/tree/Packages/r/rdfind-1.6.0-1.fc39.src.rpm
+USER_ID=1000
+GROUP_ID=1000 # implicitly created from $USER_ID on rh
+BUILD_USER=rpmbuild
+BUILD_HOME=/home/$BUILD_USER # implicitly created by useradd
+RPM_BASEDIR=/home/$BUILD_USER/RPM
+MINIMAL_RPMS="sudo wget"
+BUILD_RPMS="gcc rpm-build hostname gcc-c++ nettle-devel which"
+
+yum install -y $MINIMAL_RPMS
+test -d $BUILD_HOME || {
+    useradd -d$BUILD_HOME -m -u$USER_ID $BUILD_USER || \
+    fail "FAILED TO CREATE USER $BUILD_USER"
+}
+
+# copy over rpmmacros file and set ownership correctly
+cp rpmmacros $BUILD_HOME/.rpmmacros
+chown $BUILD_USER $BUILD_HOME/.rpmmacros
+# create directories for rpm build
+sudo -u $BUILD_USER mkdir -p $RPM_BASEDIR/{TMP,SRC,PKG}
+# download src rpm
+sudo -u $BUILD_USER wget -O $RPM_BASEDIR/SRC/$(basename $SRC_RPM_URL) $SRC_RPM_URL
+# install required build rpms
+yum install -y $BUILD_RPMS
+# install src rpm
+sudo -u $BUILD_USER rpm -i $RPM_BASEDIR/SRC/$(basename $SRC_RPM_URL)
+# rebuild from spec file
+sudo -u $BUILD_USER rpmbuild -ba $RPM_BASEDIR/SRC/rdfind.spec
+
+# copy any built files back
+for rpm in $(find $BUILD_HOME -name "*.rpm" | grep -v src.rpm); do
+    echo "Copying $rpm to PKGS/"
+    sudo -u $BUILD_USER cp $rpm PKGS/
+done
+
+exit 0

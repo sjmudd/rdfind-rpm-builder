@@ -1,0 +1,27 @@
+# Custom RPM macros configuration file for building RPM packages
+# as a non-root user.
+#
+# %_topdir defines the top directory to be used for RPM building purposes
+%_topdir        %(echo $HOME)/RPM
+%_sourcedir     %{_topdir}/SRC
+%_specdir       %{_topdir}/SRC
+%_tmppath       %{_topdir}/TMP
+%_builddir      %{_topdir}/TMP
+%_rpmdir        %{_topdir}/PKG
+%_srcrpmdir     %{_topdir}/PKG
+%_buildroot     %{_topdir}/TMP/%{name}-%{version}-root
+# careful about the UPPER case
+%_rpmfilename   %{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}.rpm
+
+## some other packaging things want this
+%tmpdir         %{_topdir}/TMP
+
+%packager       %(echo ${USER}@)%(hostname)
+%distribution   Personal Build
+
+### GNU GPG config below
+##%_signature     gpg
+##%_gpg_name      user name <user@example.com>
+##%_gpg_path      %(echo $HOME)/.gnupg
+
+%debug_package %{nil}

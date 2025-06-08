@@ -1,13 +1,21 @@
-# Rebuilding rdfind
-# - was not available on OL9 so rebuilt myself.
-# - taken from latest version of rdfind I could find.
-# - designed to be built from a bare container
+# Rebuild rdfind from another src rpm
 
-1. Create an empty PKGS directory with a non-root user
-2. run: docker run -it -v $PWD:/build -w /build oraclelinux:9
-3. from the container run sh build
+I am currently using Oracle Linux 9 and could not find rdfind
+so decided to build it myself from the latest rpm I could find.
 
-Notes:
+The build process is designed to run from a docker container to
+avoid contamination of the environment and also to allow this
+to be built from a non-OL9 box.
+
+## Steps to build
+
+1. requires docker to be installed
+2. Create an empty `PKGS` directory with a non-root user
+3. Run: `docker run -it -v $PWD:/build -w /build oraclelinux:9`
+4. From the container run: `sh build`
+5. Any built rpms should be found in `PKGS` directory on builder box.
+
+## Notes
 
 Configuration is a bit odd because I'm using an NFS mount and root_squash
 is configured so writing files as root does not work. This slightly

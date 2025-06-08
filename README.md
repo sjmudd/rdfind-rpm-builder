@@ -7,6 +7,10 @@ The build process is designed to run from a docker container to
 avoid contamination of the environment and also to allow this
 to be built on any PC/VM that can run docker.
 
+## Upstream source
+
+see: https://github.com/pauldreik/rdfind
+
 ## Steps to build
 
 1. Requires `docker` to be installed

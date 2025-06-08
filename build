@@ -1,7 +1,6 @@
 #!/bin/sh
 
 set -e  # fail on errors
-set -x  # log what's going on
 
 fail () {
     echo "FAILED: $*"
@@ -12,7 +11,7 @@ SRC_RPM_URL=https://download.fedoraproject.org/pub/fedora/linux/updates/39/Every
 USER_ID=1000
 GROUP_ID=1000 # implicitly created from $USER_ID on rh
 BUILD_USER=rpmbuild
-BUILD_HOME=/home/$BUILD_USER # implicitly created by useradd
+BUILD_HOME=/home/$BUILD_USER
 RPM_BASEDIR=/home/$BUILD_USER/RPM
 MINIMAL_RPMS="sudo wget"
 BUILD_RPMS="gcc rpm-build hostname gcc-c++ nettle-devel which"
@@ -42,5 +41,3 @@ for rpm in $(find $BUILD_HOME -name "*.rpm" | grep -v src.rpm); do
     echo "Copying $rpm to PKGS/"
     sudo -u $BUILD_USER cp $rpm PKGS/
 done
-
-exit 0
